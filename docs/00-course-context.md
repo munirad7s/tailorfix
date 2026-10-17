@@ -39,4 +39,6 @@ The chair expects solutions that are creative, elaborated and reflective, and bu
 
 ## Team
 
-Group 2 (all FAU WiSo): five students, one technical lead who maintains this repository. Roles and the weekly rhythm are agreed in the team chat; the repository tracks work through issues and milestones.
+Group 2 (all FAU WiSo): five students, one technical lead who maintains this repository. Proposed streams: A coordination and submissions, B customer research, C partners and market, D business case and story, E prototype and evaluation (technical lead). Everyone interviews; the reflection paper and the one-page contribution stay individual. The repository tracks work through issues and milestones.
+
+All dates as a calendar file: [implementing-innovation-ws26.ics](implementing-innovation-ws26.ics) (import into Google Calendar, Outlook or Apple Calendar; timezone Europe/Berlin).
