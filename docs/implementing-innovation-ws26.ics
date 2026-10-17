@@ -28,7 +28,7 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261022T164500
 DTEND;TZID=Europe/Berlin:20261022T181500
 SUMMARY:II Sitzung 2: Essentials on Platforms + 5-min Zalando-Pitch
-LOCATION:LG H4, Lange Gasse 20, Nürnberg
+LOCATION:LG H4\, Lange Gasse 20\, Nürnberg
 DESCRIPTION:Team präsentiert 5 Minuten Zalando. Canvas-Fotos machen.
 BEGIN:VALARM
 TRIGGER:-P1D
@@ -60,7 +60,7 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261029T164500
 DTEND;TZID=Europe/Berlin:20261029T181500
 SUMMARY:II Sitzung 3: Understanding your Customer
-LOCATION:LG H4, Lange Gasse 20, Nürnberg
+LOCATION:LG H4\, Lange Gasse 20\, Nürnberg
 DESCRIPTION:Erste Interviews ausgewertet mitbringen. Canvas-Fotos machen.
 END:VEVENT
 BEGIN:VEVENT
@@ -69,7 +69,7 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261105T164500
 DTEND;TZID=Europe/Berlin:20261105T181500
 SUMMARY:II Sitzung 4: Defining Business Models
-LOCATION:LG H4, Lange Gasse 20, Nürnberg
+LOCATION:LG H4\, Lange Gasse 20\, Nürnberg
 DESCRIPTION:VPC/BMC-Entwurf und Unit Economics mitbringen. Fotos machen.
 END:VEVENT
 BEGIN:VEVENT
@@ -78,7 +78,7 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261112T164500
 DTEND;TZID=Europe/Berlin:20261112T181500
 SUMMARY:II Sitzung 5: Preparing Implementation (Reflexionspapier mitbringen)
-LOCATION:LG H4, Lange Gasse 20, Nürnberg
+LOCATION:LG H4\, Lange Gasse 20\, Nürnberg
 DESCRIPTION:Gedrucktes Reflexionspapier heute ins Postfach (EG) einwerfen.
 END:VEVENT
 BEGIN:VEVENT
@@ -87,8 +87,8 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261113T100000
 DTEND;TZID=Europe/Berlin:20261113T120000
 SUMMARY:ABGABE Reflexionspapier bis 12:00 (Postfach Möslein + StudOn PDF/DOCX)
-LOCATION:Poststelle EG, Lange Gasse 20, Nürnberg
-DESCRIPTION:7 Seiten Text, Fotos Sitzung 2-5. Verspätung = nicht bestanden.
+LOCATION:Poststelle EG\, Lange Gasse 20\, Nürnberg
+DESCRIPTION:7 Seiten Text\, Fotos Sitzung 2-5. Verspätung = nicht bestanden.
 BEGIN:VALARM
 TRIGGER:-P3D
 ACTION:DISPLAY
@@ -114,7 +114,7 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261119T164500
 DTEND;TZID=Europe/Berlin:20261119T181500
 SUMMARY:II Sitzung 6: Intermediate Presentation
-LOCATION:LG H4, Lange Gasse 20, Nürnberg
+LOCATION:LG H4\, Lange Gasse 20\, Nürnberg
 DESCRIPTION:Vortrag mit Live-Demo des Klick-Dummys.
 END:VEVENT
 BEGIN:VEVENT
@@ -123,7 +123,7 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261126T164500
 DTEND;TZID=Europe/Berlin:20261126T181500
 SUMMARY:II Sitzung 7: Prototyping
-LOCATION:LG H4, Lange Gasse 20, Nürnberg
+LOCATION:LG H4\, Lange Gasse 20\, Nürnberg
 END:VEVENT
 BEGIN:VEVENT
 UID:ii-ws26-s08-20261203@tailorfix
@@ -131,7 +131,7 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261203T164500
 DTEND;TZID=Europe/Berlin:20261203T181500
 SUMMARY:II Sitzung 8: Evaluation & Testing
-LOCATION:LG H4, Lange Gasse 20, Nürnberg
+LOCATION:LG H4\, Lange Gasse 20\, Nürnberg
 END:VEVENT
 BEGIN:VEVENT
 UID:ii-ws26-s09-20261210@tailorfix
@@ -139,7 +139,7 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261210T164500
 DTEND;TZID=Europe/Berlin:20261210T181500
 SUMMARY:II Sitzung 9: Guest Lecture & Q&A
-LOCATION:LG H4, Lange Gasse 20, Nürnberg
+LOCATION:LG H4\, Lange Gasse 20\, Nürnberg
 END:VEVENT
 BEGIN:VEVENT
 UID:ii-ws26-upload2-20261216@tailorfix
@@ -147,7 +147,7 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261216T200000
 DTEND;TZID=Europe/Berlin:20261216T235900
 SUMMARY:UPLOAD Finale Präsentation + Konsolidierungsdokument bis 23:59
-DESCRIPTION:PPTX + PDF und 1 Seite je Person (400-450 Wörter, TNR 12).
+DESCRIPTION:PPTX + PDF und 1 Seite je Person (400-450 Wörter\, TNR 12).
 BEGIN:VALARM
 TRIGGER:-P2D
 ACTION:DISPLAY
@@ -160,7 +160,7 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261217T140000
 DTEND;TZID=Europe/Berlin:20261217T190000
 SUMMARY:II Finale Präsentationen Tag 1 (Anwesenheit Pflicht)
-LOCATION:LG 3152/3, Lange Gasse 20, Nürnberg
+LOCATION:LG 3152/3\, Lange Gasse 20\, Nürnberg
 END:VEVENT
 BEGIN:VEVENT
 UID:ii-ws26-final2-20261218@tailorfix
@@ -168,6 +168,6 @@ DTSTAMP:20261017T083000Z
 DTSTART;TZID=Europe/Berlin:20261218T140000
 DTEND;TZID=Europe/Berlin:20261218T190000
 SUMMARY:II Finale Präsentationen Tag 2 (Anwesenheit Pflicht)
-LOCATION:LG 3152/3, Lange Gasse 20, Nürnberg
+LOCATION:LG 3152/3\, Lange Gasse 20\, Nürnberg
 END:VEVENT
 END:VCALENDAR
