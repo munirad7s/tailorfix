@@ -1,0 +1,74 @@
+spring:
+  application:
+    name: tailorfix-backend
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/tailorfix}
+    username: ${DATABASE_USER:tailorfix}
+    password: ${DATABASE_PASSWORD:tailorfix}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+  error:
+    include-message: never
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    path: /docs
+    url: /openapi.yaml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+tailorfix:
+  economics:
+    # Working assumptions for the business case. Every number is documented with its source in docs/02-business-case.md
+    # and MUST be revisited after the interviews (see docs/06-prototype-plan.md, hypotheses H4/H6).
+    return-cost-cents: 1100          # average cost of processing one fashion return in German e-commerce (logistics + handling + value loss)
+    co2-per-return-grams: 500        # CO2e per avoided return shipment (round trip, conservative)
+    brand-share-percent: 50          # share of the voucher value carried by the brand partner, the rest by Zalando
+    min-item-price-cents: 5000       # items below this price are not eligible (voucher would exceed the saving)
+    voucher-validity-days: 14
+  matching:
+    default-radius-km: 5.0
+    max-results: 5
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:h2:mem:tailorfix;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:tailorfix-test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver

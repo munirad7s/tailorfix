@@ -1,0 +1,400 @@
+openapi: 3.0.3
+info:
+  title: TailorFix API
+  version: 0.1.0
+  description: |
+    "1-Tap Local Tailor Fix": a secondary interaction for the Zalando platform. When a customer wants to
+    return a garment because of a fit problem, the platform offers a subsidised voucher for a certified
+    local alteration tailor instead of the return.
+
+    Designed API-first according to the Zalando RESTful API Guidelines (https://opensource.zalando.com/restful-api-guidelines/):
+    resource-oriented URLs with plural nouns and no verbs, snake_case JSON properties, RFC 9457 problem JSON for
+    errors, `X-Flow-ID` on every request, and a `Money` object with decimal amount and ISO 4217 currency.
+    Student prototype (FAU, Implementing Innovation WS 2026/27, Group 2). Not affiliated with Zalando SE.
+  contact:
+    name: TailorFix team (FAU WI1 Innovation Challenge, Group 2)
+    url: https://github.com/munirad7s/tailorfix
+  license:
+    name: MIT
+x-api-id: 5a3b4d7e-1c2f-4e6a-9b8d-tailorfix0001
+x-audience: component-internal
+
+servers:
+  - url: http://localhost:8080
+    description: local development
+
+tags:
+  - name: order-items
+    description: Demo order of the prototype customer
+  - name: return-intents
+    description: A customer's intention to return an item and the eligibility decision
+  - name: tailors
+    description: Certified local alteration tailors
+  - name: vouchers
+    description: Vouchers issued for a tailor fix and their redemption by the tailor
+
+paths:
+  /order-items:
+    get:
+      tags: [order-items]
+      summary: List the items of the demo customer's latest order
+      operationId: listOrderItems
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+      responses:
+        '200':
+          description: Items delivered to the customer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderItem'
+
+  /tailors:
+    get:
+      tags: [tailors]
+      summary: Find certified tailors near a location
+      operationId: listTailors
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+        - name: lat
+          in: query
+          required: true
+          schema: { type: number, format: double, minimum: -90, maximum: 90 }
+        - name: lon
+          in: query
+          required: true
+          schema: { type: number, format: double, minimum: -180, maximum: 180 }
+        - name: radius_km
+          in: query
+          required: false
+          schema: { type: number, format: double, default: 5, minimum: 0.1, maximum: 50 }
+      responses:
+        '200':
+          description: Tailors sorted by distance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tailor'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /return-intents:
+    post:
+      tags: [return-intents]
+      summary: Register a return intention and evaluate whether a tailor fix is offered
+      description: |
+        Called from the return flow once the customer has chosen a reason. If the reason is a fit problem,
+        the item category can be altered and the economics work out, the response contains a `TailorFixOffer`
+        with nearby tailors. Otherwise `eligible` is false and the client continues with the standard return.
+      operationId: createReturnIntent
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReturnIntentRequest'
+      responses:
+        '201':
+          description: Return intent created
+          headers:
+            Location:
+              schema: { type: string, format: uri }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReturnIntent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /return-intents/{return_intent_id}:
+    get:
+      tags: [return-intents]
+      summary: Read a return intent including its offer
+      operationId: getReturnIntent
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+        - name: return_intent_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: The return intent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReturnIntent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vouchers:
+    post:
+      tags: [vouchers]
+      summary: Issue the voucher for an offer at the tailor the customer picked
+      operationId: createVoucher
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVoucherRequest'
+      responses:
+        '201':
+          description: Voucher issued
+          headers:
+            Location:
+              schema: { type: string, format: uri }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voucher'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /vouchers/{code}:
+    get:
+      tags: [vouchers]
+      summary: Read a voucher by its code (customer screen and tailor portal)
+      operationId: getVoucher
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+        - $ref: '#/components/parameters/VoucherCode'
+      responses:
+        '200':
+          description: The voucher
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voucher'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vouchers/{code}/redemptions:
+    post:
+      tags: [vouchers]
+      summary: Redeem a voucher (tailor portal)
+      description: A redemption is modelled as a sub-resource so the URL stays free of verbs.
+      operationId: createVoucherRedemption
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+        - $ref: '#/components/parameters/VoucherCode'
+      responses:
+        '201':
+          description: Voucher redeemed, payout to the tailor triggered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Redemption'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+components:
+  parameters:
+    FlowId:
+      name: X-Flow-ID
+      in: header
+      required: false
+      description: Correlation id propagated through all services and logs. Generated by the server when absent.
+      schema: { type: string }
+    VoucherCode:
+      name: code
+      in: path
+      required: true
+      schema: { type: string, pattern: '^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$' }
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    NotFound:
+      description: Resource not found
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Conflict:
+      description: State conflict (voucher already issued, already redeemed or expired)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+
+  schemas:
+    Problem:
+      type: object
+      description: RFC 9457 problem details
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer, format: int32 }
+        detail: { type: string }
+        instance: { type: string, format: uri }
+
+    Money:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount:
+          type: number
+          format: decimal
+          example: 15.00
+        currency:
+          type: string
+          description: ISO 4217 currency code
+          pattern: '^[A-Z]{3}$'
+          example: EUR
+
+    Category:
+      type: string
+      enum: [TROUSERS, SUITS, BLAZERS, DRESSES, SHIRTS, COATS, SKIRTS, KNITWEAR, SHOES, ACCESSORIES, SPORTSWEAR]
+
+    ReturnReason:
+      type: string
+      description: Reason as the customer selects it in the return flow
+      enum: [TOO_LONG, TOO_SHORT, TOO_WIDE, TOO_TIGHT, SLEEVES_TOO_LONG, DOES_NOT_FIT_OTHER, DO_NOT_LIKE, DEFECTIVE, WRONG_ITEM, ORDERED_SEVERAL_SIZES]
+
+    AlterationType:
+      type: string
+      enum: [HEM_SHORTEN, WAIST_TAKE_IN, SEAM_LET_OUT, SLEEVE_SHORTEN, GENERAL_FITTING]
+
+    VoucherStatus:
+      type: string
+      enum: [ISSUED, REDEEMED, EXPIRED]
+
+    Location:
+      type: object
+      required: [lat, lon]
+      properties:
+        lat: { type: number, format: double, minimum: -90, maximum: 90 }
+        lon: { type: number, format: double, minimum: -180, maximum: 180 }
+
+    OrderItem:
+      type: object
+      required: [id, order_number, brand, title, category, size, price, delivered_at]
+      properties:
+        id: { type: string, format: uuid }
+        order_number: { type: string }
+        brand: { type: string }
+        title: { type: string }
+        category: { $ref: '#/components/schemas/Category' }
+        size: { type: string }
+        price: { $ref: '#/components/schemas/Money' }
+        image_url: { type: string, format: uri, nullable: true }
+        delivered_at: { type: string, format: date-time }
+
+    Tailor:
+      type: object
+      required: [id, name, street, postal_code, city, lat, lon, services, certified, turnaround_days]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        street: { type: string }
+        postal_code: { type: string }
+        city: { type: string }
+        lat: { type: number, format: double }
+        lon: { type: number, format: double }
+        services:
+          type: array
+          items: { $ref: '#/components/schemas/AlterationType' }
+        certified: { type: boolean }
+        turnaround_days: { type: integer, format: int32 }
+        opening_hours: { type: string, nullable: true }
+        website: { type: string, format: uri, nullable: true }
+        distance_km: { type: number, format: double, nullable: true, description: Only present when searched by location }
+
+    CreateReturnIntentRequest:
+      type: object
+      required: [order_item_id, reason]
+      properties:
+        order_item_id: { type: string, format: uuid }
+        reason: { $ref: '#/components/schemas/ReturnReason' }
+        location:
+          allOf: [ { $ref: '#/components/schemas/Location' } ]
+          description: Customer location used to find tailors nearby (delivery address in production)
+
+    TailorFixOffer:
+      type: object
+      required: [id, alteration_type, voucher_value, estimated_return_cost, estimated_saving, estimated_co2_saved_grams, requires_tailor_check, expires_at, nearby_tailors]
+      properties:
+        id: { type: string, format: uuid }
+        alteration_type: { $ref: '#/components/schemas/AlterationType' }
+        voucher_value: { $ref: '#/components/schemas/Money' }
+        estimated_return_cost: { $ref: '#/components/schemas/Money' }
+        estimated_saving:
+          allOf: [ { $ref: '#/components/schemas/Money' } ]
+          description: Platform saving versus a standard return after paying the voucher (business-case figure)
+        estimated_co2_saved_grams: { type: integer, format: int64 }
+        requires_tailor_check:
+          type: boolean
+          description: True when the tailor must confirm feasibility first (for example letting out seams)
+        expires_at: { type: string, format: date-time }
+        nearby_tailors:
+          type: array
+          items: { $ref: '#/components/schemas/Tailor' }
+
+    ReturnIntent:
+      type: object
+      required: [id, order_item, reason, eligible, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        order_item: { $ref: '#/components/schemas/OrderItem' }
+        reason: { $ref: '#/components/schemas/ReturnReason' }
+        eligible: { type: boolean }
+        rejection_reason:
+          type: string
+          nullable: true
+          enum: [category_not_alterable, item_price_below_minimum, reason_not_fixable_by_tailor, voucher_would_exceed_saving, null]
+        offer:
+          allOf: [ { $ref: '#/components/schemas/TailorFixOffer' } ]
+          nullable: true
+        created_at: { type: string, format: date-time }
+
+    CreateVoucherRequest:
+      type: object
+      required: [offer_id, tailor_id]
+      properties:
+        offer_id: { type: string, format: uuid }
+        tailor_id: { type: string, format: uuid }
+
+    Voucher:
+      type: object
+      required: [code, status, value, brand_share, alteration_type, requires_tailor_check, tailor, qr_payload, issued_at, expires_at]
+      properties:
+        code: { type: string, example: 'K7PM-4Q2X' }
+        status: { $ref: '#/components/schemas/VoucherStatus' }
+        value: { $ref: '#/components/schemas/Money' }
+        brand_share:
+          allOf: [ { $ref: '#/components/schemas/Money' } ]
+          description: Part of the voucher value carried by the brand partner
+        alteration_type: { $ref: '#/components/schemas/AlterationType' }
+        requires_tailor_check: { type: boolean }
+        tailor: { $ref: '#/components/schemas/Tailor' }
+        qr_payload: { type: string, example: 'tailorfix:voucher:K7PM-4Q2X' }
+        issued_at: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time }
+        redeemed_at: { type: string, format: date-time, nullable: true }
+
+    Redemption:
+      type: object
+      required: [voucher_code, redeemed_at, payout_to_tailor, voucher]
+      properties:
+        voucher_code: { type: string }
+        redeemed_at: { type: string, format: date-time }
+        payout_to_tailor: { $ref: '#/components/schemas/Money' }
+        voucher: { $ref: '#/components/schemas/Voucher' }

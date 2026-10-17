@@ -1,0 +1,22 @@
+# Gradle / JVM
+backend/.gradle/
+backend/build/
+backend/out/
+*.class
+*.log
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local secrets and overrides (never commit)
+*.local
+*.local.*

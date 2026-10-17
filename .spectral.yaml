@@ -1,0 +1,20 @@
+extends: ["spectral:oas"]
+rules:
+  # Zalando guideline #118: snake_case property names
+  tailorfix-snake-case-properties:
+    description: JSON property names must be snake_case
+    given: "$.components.schemas[*].properties[*]~"
+    severity: error
+    then:
+      function: casing
+      functionOptions:
+        type: snake
+  # Zalando guideline #134: plural resource names, #141: no verbs in URLs (checked by naming review)
+  tailorfix-plural-paths:
+    description: First path segment must be a plural noun
+    given: "$.paths[*]~"
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: "^/[a-z-]+s(/|$)"
