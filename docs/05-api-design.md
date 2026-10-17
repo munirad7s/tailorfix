@@ -31,7 +31,8 @@ The contract is `api/openapi.yaml`. The backend serves the same file at `/openap
 | Situation | Status | `type` |
 |---|---|---|
 | unknown order item / tailor / offer / voucher | 404 | `https://tailorfix.dev/problems/not-found` |
-| voucher already issued, already redeemed, expired | 409 | `.../conflict` |
+| voucher already issued, already redeemed, expired, concurrent modification | 409 | `.../conflict` |
+| tailor not certified or does not offer the alteration | 422 | `.../unprocessable` |
 | validation failure (missing field, out-of-range coordinate) | 400 | Spring's default problem detail |
 
 ## Linting

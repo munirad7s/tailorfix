@@ -164,6 +164,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
 
   /vouchers/{code}:
     get:
@@ -230,7 +232,12 @@ components:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problem' }
     Conflict:
-      description: State conflict (voucher already issued, already redeemed or expired)
+      description: State conflict (voucher already issued, already redeemed, expired, or changed concurrently)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unprocessable:
+      description: Request is well-formed but not acceptable (tailor not certified or does not offer the alteration)
       content:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problem' }
