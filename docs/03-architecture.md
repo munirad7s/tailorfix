@@ -68,8 +68,10 @@ All rules sit in `domain/EligibilityPolicy.kt` and are parameterised in `applica
 
 ## What a production version would add
 
+- **Authentication and authorisation (deliberately absent in the prototype):** customers act inside their Zalando session, so a return intent is bound to the customer who owns the order item; tailors sign in to the partner portal (OAuth2 client per shop) and may only redeem vouchers issued to their own `tailor_id`; voucher lookup and redemption are rate-limited. The prototype exposes these endpoints openly so the click-dummy and the tailor portal can be demonstrated without accounts.
 - Integration with the real return flow (eligibility call before the return label is generated) and with partner settlement.
 - Tailor onboarding and certification workflow, standard price list per job, SLAs, ratings, dispute handling.
 - Fraud and abuse controls: caps per customer, garment must be unworn, voucher bound to the order item, tailor confirms the garment matches.
+- Already in the prototype: a voucher can only be issued at a certified tailor that offers the alteration (422 otherwise), one voucher per offer is enforced by a unique index, and redemption uses optimistic locking so a double scan cannot pay out twice (both answer 409).
 - Events on Kafka for the data platform (offer shown / accepted / redeemed, alteration measurements) feeding size advice.
 - Kubernetes deployment behind Skipper, PostgreSQL via the Zalando Postgres Operator, OpenTelemetry tracing with `X-Flow-ID` as correlation id.

@@ -64,6 +64,29 @@ class ReturnFlowIntegrationTest(@Autowired val http: TestRestTemplate) {
     }
 
     @Test
+    fun `a voucher can only be issued at a certified tailor that offers the alteration`() {
+        val intent = http.postForEntity<ReturnIntentDto>(
+            "/return-intents",
+            CreateReturnIntentRequest(orderItemId = trousers, reason = ReturnReason.TOO_LONG, location = nurembergCentre),
+        ).body!!
+        val offerId = intent.offer!!.id
+        val tailorWithoutHemService = UUID.fromString("7c1e0a10-0000-4000-8000-000000000006")
+        val uncertifiedTailor = UUID.fromString("7c1e0a10-0000-4000-8000-000000000021")
+
+        val wrongService = http.postForEntity<String>("/vouchers", CreateVoucherRequest(offerId = offerId, tailorId = tailorWithoutHemService))
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, wrongService.statusCode)
+
+        val uncertified = http.postForEntity<String>("/vouchers", CreateVoucherRequest(offerId = offerId, tailorId = uncertifiedTailor))
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, uncertified.statusCode)
+
+        val ok = http.postForEntity<VoucherDto>("/vouchers", CreateVoucherRequest(offerId = offerId, tailorId = intent.offer!!.nearbyTailors.first().id))
+        assertEquals(HttpStatus.CREATED, ok.statusCode)
+
+        val second = http.postForEntity<String>("/vouchers", CreateVoucherRequest(offerId = offerId, tailorId = intent.offer!!.nearbyTailors.first().id))
+        assertEquals(HttpStatus.CONFLICT, second.statusCode)
+    }
+
+    @Test
     fun `sneakers fall back to the normal return`() {
         val created = http.postForEntity<ReturnIntentDto>(
             "/return-intents",

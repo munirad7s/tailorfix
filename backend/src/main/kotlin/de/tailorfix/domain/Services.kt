@@ -22,6 +22,7 @@ import java.util.UUID
 
 class NotFoundException(val resource: String, val id: String) : RuntimeException("$resource $id not found")
 class ConflictException(message: String) : RuntimeException(message)
+class UnprocessableException(message: String) : RuntimeException(message)
 
 data class NearbyTailor(val tailor: TailorEntity, val distanceKm: Double)
 
@@ -129,8 +130,13 @@ class VoucherService(
     fun issue(offerId: UUID, tailorId: UUID): VoucherView {
         val offer = offers.findById(offerId).orElseThrow { NotFoundException("tailor_fix_offer", offerId.toString()) }
         val tailor = tailors.findById(tailorId).orElseThrow { NotFoundException("tailor", tailorId.toString()) }
+        if (!tailor.certified) throw UnprocessableException("tailor ${tailor.id} is not a certified partner")
+        if (offer.alterationType.name !in tailor.services.split(',')) {
+            throw UnprocessableException("tailor ${tailor.id} does not offer ${offer.alterationType}")
+        }
         val now = clock.instant()
         if (now.isAfter(offer.expiresAt)) throw ConflictException("offer expired")
+        // Fast path for the common case; the unique index on vouchers.offer_id is the real guarantee (V4 migration).
         vouchers.findByOfferId(offerId)?.let { throw ConflictException("voucher already issued for offer $offerId") }
 
         val voucher = vouchers.save(
